@@ -19,7 +19,7 @@ class ProductListAdapter(context: Context, entries: List<Product>, private val c
         this.entries = entries
     }
 
-    fun updateProductList(products: ArrayList<Product>) {
+    fun updateProductList(products: List<Product>) {
         this.entries = products
         notifyDataSetChanged()
     }

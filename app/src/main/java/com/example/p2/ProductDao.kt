@@ -2,12 +2,14 @@ package com.example.p2
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {
 
     @Query("SELECT * FROM product")
-    fun getAll(): List<Product>
+    fun getAll(): Flow<List<Product>>
+    //fun getAll(): List<Product>
 
 //    @Query("SELECT * FROM product WHERE id IN (:productIds)")
 //    fun getAllByIds(): LiveData<List<Product>>
@@ -20,6 +22,7 @@ interface ProductDao {
 
     @Insert
     fun insertAll(vararg products: Product)
+    //fun insertAll(products: ArrayList<Product>)
 
     @Insert
     fun insert(product: Product)
@@ -29,4 +32,7 @@ interface ProductDao {
 
     @Delete
     fun delete(product: Product)
+
+    @Query("DELETE FROM product")
+    suspend fun deleteAll()
 }
