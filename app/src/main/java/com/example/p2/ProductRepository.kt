@@ -1,22 +1,23 @@
 package com.example.p2
 
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
 
 class ProductRepository (private val productDao: ProductDao){
 
-    val products: Flow<List<Product>> = productDao.getAll()
+    val products: LiveData<List<Product>> = productDao.getAll()
 
-    fun insert(product: Product){
+    suspend fun insert(product: Product) {
         productDao.insert(product)
     }
 
-    fun update(product: Product){
+    suspend fun update(product: Product){
         productDao.update(product)
     }
 
 
-    fun delete(product: Product){
+    suspend fun delete(product: Product){
         productDao.delete(product)
     }
 

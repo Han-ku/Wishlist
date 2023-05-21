@@ -8,11 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface ProductDao {
 
     @Query("SELECT * FROM product")
-    fun getAll(): Flow<List<Product>>
-    //fun getAll(): List<Product>
-
-//    @Query("SELECT * FROM product WHERE id IN (:productIds)")
-//    fun getAllByIds(): LiveData<List<Product>>
+    fun getAll(): LiveData<List<Product>>
 
     @Query("SELECT * FROM product WHERE name LIKE :name LIMIT 1")
     fun findByName(name: String): Product
@@ -20,19 +16,15 @@ interface ProductDao {
     @Query("SELECT * FROM product WHERE adres LIKE :adres LIMIT 1")
     fun findByAdres(adres: String): Product
 
-    @Insert
-    fun insertAll(vararg products: Product)
-    //fun insertAll(products: ArrayList<Product>)
-
-    @Insert
-    fun insert(product: Product)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(product: Product)
 
     @Update
-    fun update(product: Product)
+    suspend fun update(product: Product)
 
     @Delete
-    fun delete(product: Product)
+    suspend fun delete(product: Product)
 
-    @Query("DELETE FROM product")
-    suspend fun deleteAll()
+    @Query("DELETE FROM product WHERE id = :id")
+    suspend fun deleteProductById(id: Int)
 }

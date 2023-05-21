@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 
 class ProductViewModel(private val repository: ProductRepository) : ViewModel() {
 
-    val products: LiveData<List<Product>> = repository.products.asLiveData()
+    val products: LiveData<List<Product>> = repository.products
 
     fun insert(product: Product) = viewModelScope.launch {
         repository.insert(product)

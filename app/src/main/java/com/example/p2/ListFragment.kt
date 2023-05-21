@@ -25,7 +25,6 @@ class ListFragment : Fragment() {
     private lateinit var delete: TextView
     private lateinit var cancel: TextView
     private lateinit var allProducts: List<Product>
-    private lateinit var productListAdapter: ProductListAdapter
 
     private val viewModel: ProductViewModel by viewModels {
         ProductViewModelFactory((requireActivity().application as ProductsApplication).repository)
@@ -37,46 +36,57 @@ class ListFragment : Fragment() {
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
 
-        viewModel.products.observe(requireActivity()) {
-            allProducts = it
-            binding.amountTextView.text = allProducts.size.toString()
-            productListAdapter.updateProductList(allProducts)
-        }
 
-        productListAdapter = ProductListAdapter(requireContext(), listOf(),
-            clickListener = {
-//                val transaction = requireActivity().supportFragmentManager.beginTransaction()
-//                transaction.replace(R.id.fragmentContainerView, TaskDetailsFragment.newInstance(it))
-//                transaction.addToBackStack(null)
-//                transaction.commit()
-            }
-        ) {
-            val dialog = Dialog(requireContext())
-            dialog.setContentView(R.layout.dialog_delete)
-            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-            delete = dialog.findViewById(R.id.delete)
-            cancel = dialog.findViewById(R.id.cancel)
-
-            delete.setOnClickListener { which ->
-                //adapter.updateTaskList(viewModel.deleteTask(it) as ArrayList<Product>)
-                //binding.amountTextView.text = adapter.itemCount.toString()
-                dialog.dismiss()
-            }
-
-            cancel.setOnClickListener {
-                dialog.dismiss()
-            }
-
-            dialog.show()
-        }
+        var adapter = ProductsAdapter()
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = productListAdapter
+            this.adapter  = adapter
         }
 
+        viewModel.products.observe(requireActivity()) { products ->
+            products.let { adapter.submitList(it) }
+            binding.amountTextView.text = products.size.toString()
+        }
+
+        //        viewModel.products.observe(requireActivity()) {
+//            allProducts = it
+//
+//            productListAdapter.updateProductList(allProducts)
+//        }
+
+//        productListAdapter = ProductListAdapter(requireContext(), listOf(),
+//            clickListener = {
+////                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+////                transaction.replace(R.id.fragmentContainerView, TaskDetailsFragment.newInstance(it))
+////                transaction.addToBackStack(null)
+////                transaction.commit()
+//            }
+//        ) {
+//            val dialog = Dialog(requireContext())
+//            dialog.setContentView(R.layout.dialog_delete)
+//            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+//
+//            delete = dialog.findViewById(R.id.delete)
+//            cancel = dialog.findViewById(R.id.cancel)
+//
+//            delete.setOnClickListener { which ->
+//                //adapter.updateTaskList(viewModel.deleteTask(it) as ArrayList<Product>)
+//                //binding.amountTextView.text = adapter.itemCount.toString()
+//                dialog.dismiss()
+//            }
+//
+//            cancel.setOnClickListener {
+//                dialog.dismiss()
+//            }
+//
+//            dialog.show()
+//        }
+
+
+
         binding.addBtn.setOnClickListener {
+            viewModel.insert(Product(null, "Maso","wedwed"))
 //            val transaction = requireActivity().supportFragmentManager.beginTransaction()
 //                transaction.replace(R.id.fragmentContainerView, TaskDetailsFragment.newInstance(it))
 //                transaction.addToBackStack(null)
