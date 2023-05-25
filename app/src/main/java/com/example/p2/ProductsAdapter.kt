@@ -4,11 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class ProductsAdapter: ListAdapter<Product, ProductsAdapter.ProductViewHolder>(ProductComparator()) {
+class ProductsAdapter(private val clickListener: (Product) -> Unit, private val longClickListener: (Product) -> Unit): ListAdapter<Product, ProductsAdapter.ProductViewHolder>(ProductComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         return ProductViewHolder.create(parent)
@@ -17,11 +18,21 @@ class ProductsAdapter: ListAdapter<Product, ProductsAdapter.ProductViewHolder>(P
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val current = getItem(position)
         holder.bind(current)
+
+        holder.productRowContainer.setOnClickListener {
+            clickListener(current)
+        }
+
+        holder.productRowContainer.setOnLongClickListener {
+            longClickListener(current)
+            true
+        }
     }
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.name)
         private val adres: TextView = itemView.findViewById(R.id.adres)
+        val productRowContainer : CardView = itemView.findViewById(R.id.taskRowContainer)
 
         fun bind(product: Product) {
             name.text = product.name

@@ -36,8 +36,32 @@ class ListFragment : Fragment() {
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
 
+        var adapter = ProductsAdapter(clickListener = {
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragmentContainerView, DetailsProductFragment.newInstance(it))
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }){
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_delete)
+            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        var adapter = ProductsAdapter()
+            delete = dialog.findViewById(R.id.delete)
+            cancel = dialog.findViewById(R.id.cancel)
+
+            delete.setOnClickListener { which ->
+                viewModel.delete(it)
+                //adapter.updateTaskList(viewModel.deleteTask(it) as ArrayList<Product>)
+                //binding.amountTextView.text = adapter.itemCount.toString()
+                dialog.dismiss()
+            }
+
+            cancel.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+        }
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -49,11 +73,7 @@ class ListFragment : Fragment() {
             binding.amountTextView.text = products.size.toString()
         }
 
-        //        viewModel.products.observe(requireActivity()) {
-//            allProducts = it
-//
-//            productListAdapter.updateProductList(allProducts)
-//        }
+
 
 //        productListAdapter = ProductListAdapter(requireContext(), listOf(),
 //            clickListener = {
