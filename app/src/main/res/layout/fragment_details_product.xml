@@ -62,7 +62,7 @@
                 android:text="@string/location" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/locationTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView" />
@@ -70,18 +70,18 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/editButton"
+        android:id="@+id/boughtBtn"
         style="@style/Widget.Material3.FloatingActionButton.Primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dp"
-        android:layout_marginEnd="20dp"
         android:contentDescription="fabTaskList"
-        android:text="Edytuj"
-        app:icon="@drawable/outline_edit_24"
+        android:text= "Już mam"
+        app:icon="@drawable/baseline_check_24"
         app:iconGravity="end"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
         tools:ignore="HardcodedText,ImageContrastCheck" />
 

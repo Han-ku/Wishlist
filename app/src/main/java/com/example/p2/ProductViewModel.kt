@@ -12,6 +12,10 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
         repository.insert(product)
     }
 
+    fun update(product: Product) = viewModelScope.launch {
+        repository.update(product)
+    }
+
     fun delete(product: Product) = viewModelScope.launch {
         repository.delete(product)
     }

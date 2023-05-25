@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import org.w3c.dom.Text
 
 class ProductListAdapter(context: Context, entries: List<Product>, private val clickListener: (Product) -> Unit, private val longClickListener: (Product) -> Unit)
     : RecyclerView.Adapter<ProductListAdapter.ListViewHolder>() {
@@ -34,7 +35,8 @@ class ProductListAdapter(context: Context, entries: List<Product>, private val c
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
         val product: Product = entries[position]
         holder.productName.text = product.name
-        holder.productAdres.text = product.adres
+        holder.productLocation.text = product.location
+        holder.productDescription.text = product.description
 
         holder.productRowContainer.setOnClickListener {
             clickListener(product)
@@ -50,12 +52,16 @@ class ProductListAdapter(context: Context, entries: List<Product>, private val c
 
     inner class ListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var productName: TextView
-        var productAdres: TextView
+        var productLocation: TextView
+        var productDescription: TextView
+
         var productRowContainer: CardView
 
         init {
             productName = itemView.findViewById(R.id.name)
-            productAdres = itemView.findViewById(R.id.adres)
+            productLocation = itemView.findViewById(R.id.adres)
+            productDescription = itemView.findViewById(R.id.description)
+
             productRowContainer = itemView.findViewById(R.id.taskRowContainer)
         }
     }

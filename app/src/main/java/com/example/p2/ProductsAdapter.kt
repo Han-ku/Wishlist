@@ -32,11 +32,14 @@ class ProductsAdapter(private val clickListener: (Product) -> Unit, private val 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val name: TextView = itemView.findViewById(R.id.name)
         private val adres: TextView = itemView.findViewById(R.id.adres)
+        private val description: TextView = itemView.findViewById(R.id.description)
+
         val productRowContainer : CardView = itemView.findViewById(R.id.taskRowContainer)
 
         fun bind(product: Product) {
             name.text = product.name
-            adres.text = product.adres
+            adres.text = product.location
+            description.text = product.description
         }
 
         companion object {

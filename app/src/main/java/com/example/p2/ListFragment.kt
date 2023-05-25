@@ -7,12 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
 import com.example.p2.databinding.FragmentListBinding
 
 
@@ -20,7 +16,6 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding
         get() = _binding!!
-
 
     private lateinit var delete: TextView
     private lateinit var cancel: TextView
@@ -35,6 +30,7 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
+
 
         var adapter = ProductsAdapter(clickListener = {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -51,8 +47,6 @@ class ListFragment : Fragment() {
 
             delete.setOnClickListener { which ->
                 viewModel.delete(it)
-                //adapter.updateTaskList(viewModel.deleteTask(it) as ArrayList<Product>)
-                //binding.amountTextView.text = adapter.itemCount.toString()
                 dialog.dismiss()
             }
 
@@ -69,8 +63,11 @@ class ListFragment : Fragment() {
         }
 
         viewModel.products.observe(requireActivity()) { products ->
-            products.let { adapter.submitList(it) }
-            binding.amountTextView.text = products.size.toString()
+            if (products != null) {
+                products.let { adapter.submitList(it) }
+            } else {
+                adapter.submitList(emptyList())
+            }
         }
 
 
@@ -106,12 +103,11 @@ class ListFragment : Fragment() {
 
 
         binding.addBtn.setOnClickListener {
-            viewModel.insert(Product(null, "Maso","wedwed"))
-//            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-//                transaction.replace(R.id.fragmentContainerView, TaskDetailsFragment.newInstance(it))
-//                transaction.addToBackStack(null)
-//                transaction.commit()
-//            db.productDao().insert(Product(name = "product 1", adres = "adres 1"))
+//            viewModel.insert(Product(null, "Maso","wedwed"))
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragmentContainerView, AddProductFragment())
+                transaction.addToBackStack(null)
+                transaction.commit()
         }
 
         return binding.root

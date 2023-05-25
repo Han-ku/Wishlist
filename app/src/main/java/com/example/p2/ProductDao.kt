@@ -13,8 +13,8 @@ interface ProductDao {
     @Query("SELECT * FROM product WHERE name LIKE :name LIMIT 1")
     fun findByName(name: String): Product
 
-    @Query("SELECT * FROM product WHERE adres LIKE :adres LIMIT 1")
-    fun findByAdres(adres: String): Product
+    @Query("SELECT * FROM product WHERE location LIKE :location LIMIT 1")
+    fun findByAdres(location: String): Product
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(product: Product)
