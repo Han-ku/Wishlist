@@ -43,7 +43,7 @@ class DetailsProductFragment : Fragment() {
             transaction.addToBackStack(null)
             transaction.commit()
 
-            Toast.makeText(context, "Product został kupiony", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Product został zakupiony", Toast.LENGTH_SHORT).show()
         }
 
         return binding.root

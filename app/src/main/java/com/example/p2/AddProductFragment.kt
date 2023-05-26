@@ -1,15 +1,25 @@
 package com.example.p2
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.location.Address
+import android.location.Geocoder
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.p2.databinding.FragmentAddProductBinding
+import java.util.*
 
 private const val ARG_PARAM1 = "product"
+
 class AddProductFragment : Fragment() {
     private var _binding: FragmentAddProductBinding? = null
     private val binding
@@ -21,6 +31,7 @@ class AddProductFragment : Fragment() {
 
     var product: Product? = null
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +41,21 @@ class AddProductFragment : Fragment() {
         arguments?.let {
             product = it.getSerializable(ARG_PARAM1) as Product?
         }
+
+//        TODO WHY
+        val location = arguments?.getString("latLng")
+
+        if(location != null && location != "") {
+            binding.locationTV.text = location
+        }
+
+        binding.locationImage.setOnClickListener {
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.add(R.id.fragmentContainerView, MapsFragment())
+            transaction.addToBackStack("mapsFragment")
+            transaction.commit()
+        }
+
 
         binding.saveBtn.setOnClickListener {
             if(product == null) {
@@ -44,6 +70,10 @@ class AddProductFragment : Fragment() {
             transaction.commit()
         }
 
+        binding.addImage.setOnClickListener {
+
+        }
+
         if(product != null) {
             binding.nameET.text = Editable.Factory.getInstance().newEditable(product!!.name)
             binding.locationTV.text = product!!.location
@@ -52,6 +82,8 @@ class AddProductFragment : Fragment() {
 
         return binding.root
     }
+
+
 
     companion object {
         fun newInstance(product: Product?) = AddProductFragment().apply {

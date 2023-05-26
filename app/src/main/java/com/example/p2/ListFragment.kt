@@ -1,5 +1,6 @@
 package com.example.p2
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ class ListFragment : Fragment() {
         ProductViewModelFactory((requireActivity().application as ProductsApplication).repository)
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -70,43 +72,10 @@ class ListFragment : Fragment() {
             }
         }
 
-
-
-//        productListAdapter = ProductListAdapter(requireContext(), listOf(),
-//            clickListener = {
-////                val transaction = requireActivity().supportFragmentManager.beginTransaction()
-////                transaction.replace(R.id.fragmentContainerView, TaskDetailsFragment.newInstance(it))
-////                transaction.addToBackStack(null)
-////                transaction.commit()
-//            }
-//        ) {
-//            val dialog = Dialog(requireContext())
-//            dialog.setContentView(R.layout.dialog_delete)
-//            dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-//
-//            delete = dialog.findViewById(R.id.delete)
-//            cancel = dialog.findViewById(R.id.cancel)
-//
-//            delete.setOnClickListener { which ->
-//                //adapter.updateTaskList(viewModel.deleteTask(it) as ArrayList<Product>)
-//                //binding.amountTextView.text = adapter.itemCount.toString()
-//                dialog.dismiss()
-//            }
-//
-//            cancel.setOnClickListener {
-//                dialog.dismiss()
-//            }
-//
-//            dialog.show()
-//        }
-
-
-
         binding.addBtn.setOnClickListener {
-//            viewModel.insert(Product(null, "Maso","wedwed"))
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.fragmentContainerView, AddProductFragment())
-                transaction.addToBackStack(null)
+                transaction.addToBackStack("addProductFragment")
                 transaction.commit()
         }
 
