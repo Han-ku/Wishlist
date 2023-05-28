@@ -1,6 +1,5 @@
 package com.example.p2
 
-import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 

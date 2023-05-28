@@ -131,37 +131,20 @@
                 android:src="@drawable/outline_add_a_photo_24"
                 android:layout_gravity="center" />
 
-            <LinearLayout
-                android:id="@+id/reloadImageLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/reloadImage"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/baseline_autorenew_24" />
-
-                <ImageView
-                    android:id="@+id/deleteImage"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/baseline_delete_outline_24"
-                    android:layout_marginStart="10dp" />
-
-            </LinearLayout>
-
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/imageRV"
+
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="5dp"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </HorizontalScrollView>
 
 
     </LinearLayout>
