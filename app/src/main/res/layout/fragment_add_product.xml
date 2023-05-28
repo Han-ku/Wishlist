@@ -76,31 +76,17 @@
                 android:layout_height="32dp"
                 android:src="@drawable/outline_add_location_24"
                 android:layout_gravity="center" />
-
-            <LinearLayout
-                android:id="@+id/updateLocationLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/updateLocation"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/baseline_autorenew_24" />
-
-                <ImageView
-                    android:id="@+id/deleteLocation"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/baseline_delete_outline_24"
-                    android:layout_marginStart="10dp" />
-
-            </LinearLayout>
-
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/locationErrorTV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/input_name"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/descriptionLayout"

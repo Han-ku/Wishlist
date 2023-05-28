@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.p2.databinding.FragmentAddProductBinding
-import com.google.android.gms.maps.MapFragment
 import java.util.*
 
 private const val ARG_PARAM1 = "product"
@@ -77,17 +76,20 @@ class AddProductFragment : Fragment() {
 
 
         binding.saveBtn.setOnClickListener {
-            if(product == null) {
-                viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
-            } else if(product != null) {
-                viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
+            val allInfo = checkInfo()
+
+            if (allInfo) {
+                if (product == null) {
+                    viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
+                } else {
+                    viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
+                }
+
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragmentContainerView, ListFragment())
+                transaction.addToBackStack(null)
+                transaction.commit()
             }
-
-
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragmentContainerView, ListFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
         }
 
         photoAdapter = PhotoAdapter(photos)
@@ -171,6 +173,26 @@ class AddProductFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    fun checkInfo(): Boolean {
+        var allInfo = true
+
+        if (binding.nameET.text.toString().isEmpty()) {
+            allInfo = false
+            binding.nameErrorTV.visibility = View.VISIBLE
+        } else {
+            binding.nameErrorTV.visibility = View.GONE
+        }
+
+        if (binding.locationTV.text.isNullOrEmpty()) {
+            allInfo = false
+            binding.locationErrorTV.visibility = View.VISIBLE
+        } else {
+            binding.locationErrorTV.visibility = View.GONE
+        }
+
+        return allInfo
     }
 
     fun resizeBitmap(photo: Bitmap, desiredWidth: Int, desiredHeight: Int): Bitmap {
