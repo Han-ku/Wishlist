@@ -3,6 +3,7 @@ package com.example.p2
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
@@ -30,16 +31,16 @@ class ProductsAdapter(private val clickListener: (Product) -> Unit, private val 
     }
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+//        private val photo: ImageView = itemView.findViewById(R.id.photo)
         private val name: TextView = itemView.findViewById(R.id.name)
         private val adres: TextView = itemView.findViewById(R.id.adres)
-        private val description: TextView = itemView.findViewById(R.id.description)
 
         val productRowContainer : CardView = itemView.findViewById(R.id.taskRowContainer)
 
         fun bind(product: Product) {
+//            photo.setImageBitmap(product.)
             name.text = product.name
             adres.text = product.location
-            description.text = product.description
         }
 
         companion object {
