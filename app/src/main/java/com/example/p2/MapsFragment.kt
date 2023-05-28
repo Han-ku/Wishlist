@@ -3,6 +3,8 @@ package com.example.p2
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
@@ -10,6 +12,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -20,8 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.*
 import java.util.*
 
 const val RANGE = 10.0
@@ -35,11 +37,6 @@ class MapsFragment() : Fragment() {
         get()=_binding!!
 
     private lateinit var map: GoogleMap
-//    private val callback = OnMapReadyCallback { googleMap ->
-//        map = googleMap
-//        turnOnLocation()
-//        googleMap.setOnMapClickListener(::onMapClick)
-//    }
 
     var loc = ""
     private var onLocationSelectedListener: OnLocationSelectedListener? = null
@@ -59,7 +56,7 @@ class MapsFragment() : Fragment() {
                 moveToCurrentLocation()
             }
         } else {
-            // Обработка случая, когда разрешения не были предоставлены
+            Toast.makeText(requireContext(), "Rejected",  Toast.LENGTH_LONG).show()
         }
     }
 
@@ -131,7 +128,7 @@ class MapsFragment() : Fragment() {
         }
     }
     private fun onMapClick(latLng: LatLng) {
-        drawCircle(latLng)
+        drawMarker(latLng)
         setAdress(latLng)
         getLocation()
     }
@@ -147,16 +144,35 @@ class MapsFragment() : Fragment() {
         }
     }
 
-    private fun drawCircle(latLng: LatLng) {
-//        TODO change circle to photo outline_location_on_24
-        var circle = CircleOptions()
-            .strokeColor(Color.RED)
-            .radius(RANGE)
-            .center(latLng)
-            .strokeWidth(STROKE_WIDTH)
+//    private fun drawCircle(latLng: LatLng) {
+////        TODO change circle to photo outline_location_on_24
+//        var circle = CircleOptions()
+//            .strokeColor(Color.RED)
+//            .radius(RANGE)
+//            .center(latLng)
+//            .strokeWidth(STROKE_WIDTH)
+//
+//        map.apply {
+//            clear()
+//            addCircle(circle)
+//        }
+//    }
+
+    private fun drawMarker(latLng: LatLng) {
+        val width = 80
+        val height = 90
+
+        val bitmap: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.location)
+        val scaledBitmap: Bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false)
+        val bitmapDescriptor: BitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+
+        val markerOptions = MarkerOptions()
+            .position(latLng)
+            .icon(bitmapDescriptor)
+
         map.apply {
             clear()
-            addCircle(circle)
+            addMarker(markerOptions)
         }
     }
 
