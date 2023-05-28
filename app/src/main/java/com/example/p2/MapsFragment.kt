@@ -2,7 +2,6 @@ package com.example.p2
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Address
@@ -15,8 +14,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.example.p2.databinding.FragmentMapsBinding
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -35,11 +35,11 @@ class MapsFragment() : Fragment() {
         get()=_binding!!
 
     private lateinit var map: GoogleMap
-    private val callback = OnMapReadyCallback { googleMap ->
-        map = googleMap
-        turnOnLocation()
-        googleMap.setOnMapClickListener(::onMapClick)
-    }
+//    private val callback = OnMapReadyCallback { googleMap ->
+//        map = googleMap
+//        turnOnLocation()
+//        googleMap.setOnMapClickListener(::onMapClick)
+//    }
 
     var loc = ""
     private var onLocationSelectedListener: OnLocationSelectedListener? = null
@@ -47,12 +47,19 @@ class MapsFragment() : Fragment() {
 
     @SuppressLint("MissingPermission")
     private val onPermisonResult = { results: Map<String, Boolean> ->
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+        if (results[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+            results[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         ) {
-            map.isMyLocationEnabled = true
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                map.isMyLocationEnabled = true
+                moveToCurrentLocation()
+            }
+        } else {
+            // Обработка случая, когда разрешения не были предоставлены
         }
     }
 
@@ -77,7 +84,21 @@ class MapsFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+        mapFragment?.getMapAsync(OnMapReadyCallback { googleMap ->
+            map = googleMap
+            turnOnLocation()
+
+//            googleMap.uiSettings.isZoomControlsEnabled = true
+            googleMap.setOnMapClickListener(::onMapClick)
+
+            binding.zoomInBtn.setOnClickListener {
+                map.animateCamera(CameraUpdateFactory.zoomIn())
+            }
+
+            binding.zoomOutBtn.setOnClickListener {
+                map.animateCamera(CameraUpdateFactory.zoomOut())
+            }
+        })
     }
 
     private fun turnOnLocation() {
@@ -87,6 +108,7 @@ class MapsFragment() : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             map.isMyLocationEnabled = true
+            moveToCurrentLocation()
         } else {
             permissionLauncher.launch(
                 arrayOf(
@@ -97,6 +119,17 @@ class MapsFragment() : Fragment() {
         }
     }
 
+
+    @SuppressLint("MissingPermission")
+    private fun moveToCurrentLocation() {
+        val locationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        locationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val latLng = LatLng(location.latitude, location.longitude)
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            }
+        }
+    }
     private fun onMapClick(latLng: LatLng) {
         drawCircle(latLng)
         setAdress(latLng)
