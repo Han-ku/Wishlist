@@ -65,12 +65,22 @@ class ListFragment : Fragment() {
         }
 
         viewModel.products.observe(requireActivity()) { products ->
-            if (products != null) {
-                products.let { adapter.submitList(it) }
+//            if (products != null) {
+//                products.let { adapter.submitList(it) }
+//            } else {
+//                adapter.submitList(emptyList())
+//            }
+
+            val sortedList = products?.sortedByDescending { it.id }
+
+            if (sortedList != null) {
+                adapter.submitList(sortedList)
             } else {
                 adapter.submitList(emptyList())
             }
         }
+
+
 
         binding.addBtn.setOnClickListener {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
