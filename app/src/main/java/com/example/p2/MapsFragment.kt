@@ -108,10 +108,28 @@ class MapsFragment() : Fragment() {
     private fun onMapClick(latLng: LatLng) {
         drawCircle(latLng)
         setAdress(latLng)
-        askForSave()
+        getLocation()
+    }
+
+
+    private fun getLocation() {
+        binding.locationLayout.visibility = View.VISIBLE
+        binding.locationTV.text = loc
+
+        binding.saveBtn.setOnClickListener {
+            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
+            val previousFragment = fragmentManager.fragments[fragmentManager.fragments.size - 2]
+
+            val args = Bundle()
+            args.putString("latLng", loc)
+            previousFragment.arguments = args
+
+            fragmentManager.popBackStack()
+        }
     }
 
     private fun askForSave() {
+
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_location)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
