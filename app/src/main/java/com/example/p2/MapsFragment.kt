@@ -42,7 +42,7 @@ class MapsFragment() : Fragment() {
     }
 
     var loc = ""
-
+    private var onLocationSelectedListener: OnLocationSelectedListener? = null
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
     @SuppressLint("MissingPermission")
@@ -106,15 +106,10 @@ class MapsFragment() : Fragment() {
     private fun getLocation() {
         binding.locationLayout.visibility = View.VISIBLE
         binding.locationTV.text = loc
+        onLocationSelectedListener?.onLocationSelected(loc)
 
         binding.saveBtn.setOnClickListener {
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            val previousFragment = fragmentManager.fragments[fragmentManager.fragments.size - 2]
-
-            val args = Bundle()
-            args.putString("latLng", loc)
-            previousFragment.arguments = args
-
+            val fragmentManager = requireActivity().supportFragmentManager
             fragmentManager.popBackStack()
         }
     }
@@ -146,4 +141,12 @@ class MapsFragment() : Fragment() {
         val street: String = addresses[0].getAddressLine(0)
         loc = street
     }
+
+    fun setOnLocationSelectedListener(listener: OnLocationSelectedListener) {
+        onLocationSelectedListener = listener
+    }
+}
+
+interface OnLocationSelectedListener {
+    fun onLocationSelected(address: String)
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.p2.databinding.FragmentAddProductBinding
+import com.google.android.gms.maps.MapFragment
 import java.util.*
 
 private const val ARG_PARAM1 = "product"
@@ -31,7 +32,6 @@ class AddProductFragment : Fragment() {
 
     var product: Product? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,16 +42,16 @@ class AddProductFragment : Fragment() {
             product = it.getSerializable(ARG_PARAM1) as Product?
         }
 
-//        TODO WHY
-        val location = arguments?.getString("latLng")
-
-        if(location != null && location != "") {
-            binding.locationTV.text = location
-        }
 
         binding.locationImage.setOnClickListener {
+            val mapFragment = MapsFragment()
+            mapFragment.setOnLocationSelectedListener(object : OnLocationSelectedListener {
+                override fun onLocationSelected(address: String) {
+                    binding.locationTV.text = address
+                }
+            })
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.add(R.id.fragmentContainerView, MapsFragment())
+            transaction.add(R.id.fragmentContainerView, mapFragment)
             transaction.addToBackStack("mapsFragment")
             transaction.commit()
         }
@@ -63,6 +63,7 @@ class AddProductFragment : Fragment() {
             } else if(product != null) {
                 viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
             }
+
 
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fragmentContainerView, ListFragment())
