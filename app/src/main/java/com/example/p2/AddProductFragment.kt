@@ -6,8 +6,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
@@ -47,7 +46,7 @@ class AddProductFragment : Fragment() {
 
     private lateinit var photoAdapter: PhotoAdapter
     private val photos: MutableList<Bitmap> = mutableListOf()
-    private lateinit var photo: ByteArray
+    private lateinit var photo: Bitmap
 
     private lateinit var delete: TextView
     private lateinit var cancel: TextView
@@ -86,9 +85,9 @@ class AddProductFragment : Fragment() {
 
             if (allInfo) {
                 if (product == null) {
-                    viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), photo))
+                    viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), getСompressedPhotoWithText(binding.descriptionET.text.toString())))
                 } else {
-                    viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), photo))
+                    viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), getСompressedPhotoWithText(binding.descriptionET.text.toString())))
                 }
 
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -153,14 +152,30 @@ class AddProductFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             //photos.add(imageBitmap)
-
-            val stream = ByteArrayOutputStream()
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            photo = stream.toByteArray()
+            photo = imageBitmap
+            //val stream = ByteArrayOutputStream()
+            //imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            //photo = stream.toByteArray()
             binding.imageView.setImageBitmap(resizeBitmap(imageBitmap, 500, 600))
 
             //photoAdapter.notifyItemInserted(photos.size - 1)
         }
+    }
+
+    fun getСompressedPhotoWithText(userText : String) : ByteArray {
+        val bitmapWithText = Bitmap.createBitmap(photo.width, photo.height, photo.config)
+        val canvas = Canvas(bitmapWithText)
+        canvas.drawBitmap(photo, 0f, 0f, null)
+
+        val paint = Paint()
+        paint.textSize = 32f
+        paint.color = Color.RED
+
+        canvas.drawText(userText, 35F, 35F, paint)
+
+        val stream = ByteArrayOutputStream()
+        bitmapWithText.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
     }
 
     @SuppressLint("MissingInflatedId")
