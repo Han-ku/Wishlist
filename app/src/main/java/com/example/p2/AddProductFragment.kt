@@ -25,7 +25,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.p2.databinding.FragmentAddProductBinding
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 private const val ARG_PARAM1 = "product"
@@ -45,6 +47,7 @@ class AddProductFragment : Fragment() {
 
     private lateinit var photoAdapter: PhotoAdapter
     private val photos: MutableList<Bitmap> = mutableListOf()
+    private lateinit var photo: ByteArray
 
     private lateinit var delete: TextView
     private lateinit var cancel: TextView
@@ -60,6 +63,9 @@ class AddProductFragment : Fragment() {
             product = it.getSerializable(ARG_PARAM1) as Product?
         }
 
+        binding.imageView.setOnClickListener {
+            openImageDialog()
+        }
 
         binding.locationImage.setOnClickListener {
             val mapFragment = MapsFragment()
@@ -80,9 +86,9 @@ class AddProductFragment : Fragment() {
 
             if (allInfo) {
                 if (product == null) {
-                    viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
+                    viewModel.insert(Product(null, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), photo))
                 } else {
-                    viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString()))
+                    viewModel.update(Product(product!!.id, binding.nameET.text.toString(), binding.locationTV.text.toString(), binding.descriptionET.text.toString(), photo))
                 }
 
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -146,19 +152,25 @@ class AddProductFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
-            photos.add(imageBitmap)
-            photoAdapter.notifyItemInserted(photos.size - 1)
+            //photos.add(imageBitmap)
+
+            val stream = ByteArrayOutputStream()
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            photo = stream.toByteArray()
+            binding.imageView.setImageBitmap(resizeBitmap(imageBitmap, 500, 600))
+
+            //photoAdapter.notifyItemInserted(photos.size - 1)
         }
     }
 
     @SuppressLint("MissingInflatedId")
-    fun openImageDialog(context: Context, photo: Bitmap, position: Int) {
-        val dialog = Dialog(context)
+    fun openImageDialog() {
+        val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_image)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         image = dialog.findViewById(R.id.photo)
-        image.setImageBitmap(resizeBitmap(photo, 500, 600))
+        //image.setImageBitmap(resizeBitmap(photo, 500, 600))
 
         delete = dialog.findViewById(R.id.delete)
         cancel = dialog.findViewById(R.id.cancel)

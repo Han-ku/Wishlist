@@ -1,5 +1,6 @@
 package com.example.p2
 
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.imageview.ShapeableImageView
 
 class ProductsAdapter(private val clickListener: (Product) -> Unit, private val longClickListener: (Product) -> Unit): ListAdapter<Product, ProductsAdapter.ProductViewHolder>(ProductComparator()) {
 
@@ -31,14 +33,15 @@ class ProductsAdapter(private val clickListener: (Product) -> Unit, private val 
     }
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        private val photo: ImageView = itemView.findViewById(R.id.photo)
+        private val photo: ShapeableImageView = itemView.findViewById(R.id.photo)
         private val name: TextView = itemView.findViewById(R.id.name)
         private val adres: TextView = itemView.findViewById(R.id.adres)
 
         val productRowContainer : CardView = itemView.findViewById(R.id.taskRowContainer)
 
         fun bind(product: Product) {
-//            photo.setImageBitmap(product.)
+            val photoBitmap = BitmapFactory.decodeByteArray(product.photo, 0, product.photo!!.size)
+            photo.setImageBitmap(photoBitmap)
             name.text = product.name
             adres.text = product.location
         }

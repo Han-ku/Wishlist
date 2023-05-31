@@ -10,6 +10,6 @@ data class Product(
     @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "id") var id: Int?,
     @ColumnInfo(name = "name") var name: String?,
     @ColumnInfo(name = "location") var location: String?,
-    @ColumnInfo(name = "description") var description: String?
-
+    @ColumnInfo(name = "description") var description: String?,
+    @ColumnInfo(name = "photo") var photo: ByteArray?
 ): Serializable

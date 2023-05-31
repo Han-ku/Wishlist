@@ -1,5 +1,7 @@
 package com.example.p2
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -34,6 +36,8 @@ class DetailsProductFragment : Fragment() {
         binding.titleTV.text = product!!.name
         binding.descriptionTV.text = product!!.description
         binding.locationTV.text = product!!.location
+        val photoBitmap = BitmapFactory.decodeByteArray(product!!.photo, 0, product!!.photo!!.size)
+        binding.photo.setImageBitmap(resizeBitmap(photoBitmap, 500, 600))
 
         binding.boughtBtn.setOnClickListener {
             viewModel.delete(product!!)
@@ -66,6 +70,11 @@ class DetailsProductFragment : Fragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun resizeBitmap(photo: Bitmap, desiredWidth: Int, desiredHeight: Int): Bitmap {
+        val scaledBitmap = Bitmap.createScaledBitmap(photo, desiredWidth, desiredHeight, true)
+        return scaledBitmap
     }
 
 

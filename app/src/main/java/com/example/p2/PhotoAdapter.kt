@@ -14,13 +14,13 @@ class PhotoAdapter(private val photos: MutableList<Bitmap>) : RecyclerView.Adapt
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
 
         init {
-            imageView.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val photo = photos[position]
-                    AddProductFragment().openImageDialog(itemView.context, photo, position)
-                }
-            }
+//            imageView.setOnClickListener {
+//                val position = adapterPosition
+//                if (position != RecyclerView.NO_POSITION) {
+//                    val photo = photos[position]
+//                    AddProductFragment().openImageDialog(itemView.context, photo, position)
+//                }
+//            }
         }
     }
 
