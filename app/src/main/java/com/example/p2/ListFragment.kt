@@ -2,16 +2,27 @@ package com.example.p2
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
+import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
+import android.graphics.Color
+import android.location.Geocoder
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.p2.databinding.FragmentListBinding
-
+import com.google.android.gms.maps.model.LatLng
+import java.io.IOException
 
 class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
@@ -26,13 +37,14 @@ class ListFragment : Fragment() {
         ProductViewModelFactory((requireActivity().application as ProductsApplication).repository)
     }
 
-    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation", "MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentListBinding.inflate(inflater, container, false)
 
+        createNotificationChannel()
 
         var adapter = ProductsAdapter(clickListener = {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -65,36 +77,133 @@ class ListFragment : Fragment() {
         }
 
         viewModel.products.observe(requireActivity()) { products ->
-//            if (products != null) {
-//                products.let { adapter.submitList(it) }
-//            } else {
-//                adapter.submitList(emptyList())
-//            }
-
-            val sortedList = products?.sortedByDescending { it.id }
+            val sortedList = products?.sortedBy { it.id }
 
             if (sortedList != null) {
                 adapter.submitList(sortedList)
+                allProducts = sortedList
+                checkDistance()
             } else {
                 adapter.submitList(emptyList())
             }
         }
 
-
-
         binding.addBtn.setOnClickListener {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragmentContainerView, AddProductFragment())
-                transaction.addToBackStack("addProductFragment")
-                transaction.commit()
+            transaction.replace(R.id.fragmentContainerView, AddProductFragment())
+            transaction.addToBackStack("addProductFragment")
+            transaction.commit()
         }
 
         return binding.root
     }
 
+    fun checkDistance() {
+        LocationTracker(requireContext()).getCurrentLocation { location ->
+            val currentUserLocation: LatLng = location!!
+            val distanceThreshold = 100.0
+
+            for (product in allProducts) {
+                val productLocation: LatLng = convertAddressToLatLng(product.location!!)!!
+
+                val distance: Double = calculateDistance(currentUserLocation, productLocation)
+
+                if (distance <= distanceThreshold) {
+                    createNotification(product.name!!, product.id!!)
+                }
+            }
+        }
+    }
+
+    fun convertAddressToLatLng(address: String): LatLng? {
+        val geocoder = Geocoder(requireContext())
+        try {
+            val addresses = geocoder.getFromLocationName(address, 1)
+            if (addresses!!.isNotEmpty()) {
+                val latitude = addresses[0].latitude
+                val longitude = addresses[0].longitude
+                return LatLng(latitude, longitude)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    fun calculateDistance(latLng1: LatLng, latLng2: LatLng): Double {
+        val earthRadius = 6371.0
+
+        val lat1 = Math.toRadians(latLng1.latitude)
+        val lon1 = Math.toRadians(latLng1.longitude)
+        val lat2 = Math.toRadians(latLng2.latitude)
+        val lon2 = Math.toRadians(latLng2.longitude)
+
+        val dLat = lat2 - lat1
+        val dLon = lon2 - lon1
+
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        val distance = earthRadius * c
+        return distance * 1000 // Convert distance to meters
+    }
+
+    fun createNotificationChannel() {
+        val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            lightColor = Color.BLUE
+            enableLights(true)
+        }
+        val manager = requireContext().getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+    }
+
+    fun createNotification(name: String, productId: Int) {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.putExtra("productId", productId)
+
+        val pendingIntent = TaskStackBuilder.create(requireContext()).run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val locationTracker = LocationTracker(requireContext())
+
+        if(locationTracker.checkLocationPermission()) {
+            locationTracker.startLocationUpdates()
+            locationTracker.getCurrentLocation { location ->
+
+                val notification = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                    .setContentTitle("Title")
+                    .setContentText("Product $name is nearby.")
+                    .setSmallIcon(R.drawable.baseline_notifications_none_24)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(pendingIntent)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+                    .setAutoCancel(true)
+                    .build()
+
+                val notificationManager = NotificationManagerCompat.from(requireContext())
+
+                notificationManager.notify(NOTIFICTION_ID, notification)
+            }
+        }
+
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+
+        LocationTracker(requireContext()).stopLocationUpdates()
     }
+
+    private companion object {
+        private const val CHANNEL_ID = "channelId"
+        private const val CHANNEL_NAME = "channelName"
+        private const val NOTIFICTION_ID = 0
+    }
+
 }

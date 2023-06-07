@@ -31,13 +31,15 @@ class DetailsProductFragment : Fragment() {
 
         arguments?.let {
             product = it.getSerializable(ARG_PARAM1) as Product?
+            if (product == null) {
+                val productId = it.getInt("productId", -1)
+                if (productId != -1) {
+//                    TODO как взять эти ебаные данные
+                }
+            } else {
+                populateProductDetails()
+            }
         }
-
-        binding.titleTV.text = product!!.name
-        binding.descriptionTV.text = product!!.description
-        binding.locationTV.text = product!!.location
-        val photoBitmap = BitmapFactory.decodeByteArray(product!!.photo, 0, product!!.photo!!.size)
-        binding.photo.setImageBitmap(resizeBitmap(photoBitmap, 500, 600))
 
         binding.boughtBtn.setOnClickListener {
             viewModel.delete(product!!)
@@ -51,6 +53,14 @@ class DetailsProductFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun populateProductDetails() {
+        binding.titleTV.text = product!!.name
+        binding.descriptionTV.text = product!!.description
+        binding.locationTV.text = product!!.location
+        val photoBitmap = BitmapFactory.decodeByteArray(product!!.photo, 0, product!!.photo!!.size)
+        binding.photo.setImageBitmap(resizeBitmap(photoBitmap, 500, 600))
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -9,4 +9,5 @@
     <string name="add_description">Dodaj opis</string>
     <string name="description">Opis</string>
     <string name="location">Lokalizacja</string>
+    <string name="channel_description">channel_description</string>
 </resources>
