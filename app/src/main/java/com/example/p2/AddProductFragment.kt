@@ -13,10 +13,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -57,6 +55,9 @@ class AddProductFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding =  FragmentAddProductBinding.inflate(inflater, container, false)
+
+        setHasOptionsMenu(true)
+
 
         arguments?.let {
             product = it.getSerializable(ARG_PARAM1) as Product?
@@ -194,6 +195,26 @@ class AddProductFragment : Fragment() {
     fun resizeBitmap(photo: Bitmap, desiredWidth: Int, desiredHeight: Int): Bitmap {
         val scaledBitmap = Bitmap.createScaledBitmap(photo, desiredWidth, desiredHeight, true)
         return scaledBitmap
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_menu, menu)
+        menu.findItem(R.id.edit)?.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.back -> {
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fragmentContainerView, ListFragment())
+                transaction.addToBackStack(null)
+                transaction.commit()
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     companion object {
