@@ -62,10 +62,6 @@ class AddProductFragment : Fragment() {
             product = it.getSerializable(ARG_PARAM1) as Product?
         }
 
-        binding.imageView.setOnClickListener {
-            openImageDialog()
-        }
-
         binding.locationImage.setOnClickListener {
             val mapFragment = MapsFragment()
             mapFragment.setOnLocationSelectedListener(object : OnLocationSelectedListener {
@@ -121,6 +117,9 @@ class AddProductFragment : Fragment() {
             binding.nameET.text = Editable.Factory.getInstance().newEditable(product!!.name)
             binding.locationTV.text = product!!.location
             binding.descriptionET.text = Editable.Factory.getInstance().newEditable(product!!.description)
+
+            val bitmap = BitmapFactory.decodeByteArray(product?.photo, 0, product?.photo?.size ?: 0)
+            binding.imageView.setImageBitmap(resizeBitmap(bitmap, 500, 600))
         }
 
         return binding.root
@@ -151,14 +150,8 @@ class AddProductFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             val imageBitmap = data?.extras?.get("data") as Bitmap
-            //photos.add(imageBitmap)
             photo = imageBitmap
-            //val stream = ByteArrayOutputStream()
-            //imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            //photo = stream.toByteArray()
             binding.imageView.setImageBitmap(resizeBitmap(imageBitmap, 500, 600))
-
-            //photoAdapter.notifyItemInserted(photos.size - 1)
         }
     }
 
@@ -176,30 +169,6 @@ class AddProductFragment : Fragment() {
         val stream = ByteArrayOutputStream()
         bitmapWithText.compress(Bitmap.CompressFormat.PNG, 100, stream)
         return stream.toByteArray()
-    }
-
-    @SuppressLint("MissingInflatedId")
-    fun openImageDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_image)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        image = dialog.findViewById(R.id.photo)
-        //image.setImageBitmap(resizeBitmap(photo, 500, 600))
-
-        delete = dialog.findViewById(R.id.delete)
-        cancel = dialog.findViewById(R.id.cancel)
-
-//        TODO add functionality
-        delete.setOnClickListener { which ->
-            dialog.dismiss()
-        }
-
-        cancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
     }
 
     fun checkInfo(): Boolean {
