@@ -7,4 +7,12 @@
         android:icon="@drawable/outline_edit_24"
         app:showAsAction="always"
         />
+
+    <item
+        android:id="@+id/back"
+        android:title="Back"
+        android:icon="@drawable/baseline_close_24"
+        app:showAsAction="always"
+        />
+
 </menu>
