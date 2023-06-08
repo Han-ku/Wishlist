@@ -10,6 +10,9 @@ interface ProductDao {
     @Query("SELECT * FROM product")
     fun getAll(): LiveData<List<Product>>
 
+    @Query("SELECT * FROM product WHERE id = :id")
+    fun findById(id: Int): LiveData<Product>
+
     @Query("SELECT * FROM product WHERE name LIKE :name LIMIT 1")
     fun findByName(name: String): Product
 

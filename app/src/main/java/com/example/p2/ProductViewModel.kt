@@ -7,6 +7,10 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
 
     val products: LiveData<List<Product>> = repository.products
 
+    fun findById(id: Int): LiveData<Product> {
+        return repository.findById(id)
+    }
+
     fun insert(product: Product) = viewModelScope.launch {
         repository.insert(product)
     }

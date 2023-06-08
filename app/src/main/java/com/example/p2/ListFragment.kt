@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
+import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.graphics.Color
@@ -31,7 +32,7 @@ class ListFragment : Fragment() {
 
     private lateinit var delete: TextView
     private lateinit var cancel: TextView
-    private lateinit var allProducts: List<Product>
+    private var allProducts: List<Product> = emptyList()
 
     private val viewModel: ProductViewModel by viewModels {
         ProductViewModelFactory((requireActivity().application as ProductsApplication).repository)
@@ -82,7 +83,7 @@ class ListFragment : Fragment() {
             if (sortedList != null) {
                 adapter.submitList(sortedList)
                 allProducts = sortedList
-                checkDistance()
+                context?.let { checkDistance(it) }
             } else {
                 adapter.submitList(emptyList())
             }
@@ -98,25 +99,33 @@ class ListFragment : Fragment() {
         return binding.root
     }
 
-    fun checkDistance() {
-        LocationTracker(requireContext()).getCurrentLocation { location ->
-            val currentUserLocation: LatLng = location!!
-            val distanceThreshold = 100.0
+    fun checkDistance(context: Context) {
+        if (allProducts.isNotEmpty()) {
+            val fragmentContext = context ?: return
 
-            for (product in allProducts) {
-                val productLocation: LatLng = convertAddressToLatLng(product.location!!)!!
+            LocationTracker(fragmentContext).getCurrentLocation { location ->
+                if (location != null) {
+                    val currentUserLocation: LatLng = location
+                    val distanceThreshold = 100.0
 
-                val distance: Double = calculateDistance(currentUserLocation, productLocation)
+                    for (product in allProducts) {
+                        val productLocation: LatLng = convertAddressToLatLng(context, product.location!!)!!
 
-                if (distance <= distanceThreshold) {
-                    createNotification(product.name!!, product.id!!)
+                        if (productLocation != null) {
+                            val distance: Double = calculateDistance(currentUserLocation, productLocation)
+
+                            if (distance <= distanceThreshold) {
+                                createNotification(fragmentContext, product.name!!, product.id!!)
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    fun convertAddressToLatLng(address: String): LatLng? {
-        val geocoder = Geocoder(requireContext())
+    fun convertAddressToLatLng(context: Context, address: String): LatLng? {
+        val geocoder = Geocoder(context)
         try {
             val addresses = geocoder.getFromLocationName(address, 1)
             if (addresses!!.isNotEmpty()) {
@@ -160,43 +169,45 @@ class ListFragment : Fragment() {
         manager.createNotificationChannel(channel)
     }
 
-    fun createNotification(name: String, productId: Int) {
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.putExtra("productId", productId)
+    fun createNotification(context: Context, name: String, productId: Int) {
+        val detailsIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra("productId", productId)
+            putExtra("fragmentToLoad", "DetailsProductFragment")
+        }
 
-        val pendingIntent = TaskStackBuilder.create(requireContext()).run {
-            addNextIntentWithParentStack(intent)
+        val pendingIntent = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(detailsIntent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val locationTracker = LocationTracker(requireContext())
+        val locationTracker = LocationTracker(context)
 
-        if(locationTracker.checkLocationPermission()) {
+        if (locationTracker.checkLocationPermission()) {
             locationTracker.startLocationUpdates()
             locationTracker.getCurrentLocation { location ->
 
-                val notification = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setContentTitle("Title")
                     .setContentText("Product $name is nearby.")
                     .setSmallIcon(R.drawable.baseline_notifications_none_24)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(pendingIntent)
-                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+//                    .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setAutoCancel(true)
                     .build()
 
-                val notificationManager = NotificationManagerCompat.from(requireContext())
+                val notificationManager = NotificationManagerCompat.from(context)
 
                 notificationManager.notify(NOTIFICTION_ID, notification)
             }
         }
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
 
+        checkDistance(requireContext())
         LocationTracker(requireContext()).stopLocationUpdates()
     }
 

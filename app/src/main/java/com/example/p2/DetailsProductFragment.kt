@@ -34,7 +34,10 @@ class DetailsProductFragment : Fragment() {
             if (product == null) {
                 val productId = it.getInt("productId", -1)
                 if (productId != -1) {
-//                    TODO как взять эти ебаные данные
+                    viewModel.findById(productId).observe(viewLifecycleOwner) { loadedProduct ->
+                            product = loadedProduct
+                            populateProductDetails()
+                    }
                 }
             } else {
                 populateProductDetails()
@@ -93,6 +96,14 @@ class DetailsProductFragment : Fragment() {
             arguments = Bundle().apply {
                 putSerializable(ARG_PARAM1, product)
             }
+        }
+
+        fun newInstance(productId: Int): DetailsProductFragment {
+            val fragment = DetailsProductFragment()
+            val args = Bundle()
+            args.putInt("productId", productId)
+            fragment.arguments = args
+            return fragment
         }
     }
 }

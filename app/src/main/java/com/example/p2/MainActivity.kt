@@ -12,5 +12,17 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .add(R.id.fragmentContainerView, ListFragment())
             .commit()
+
+        if (intent?.extras != null) {
+            val fragmentToLoad = intent?.extras?.getString("fragmentToLoad")
+            val productId = intent?.extras?.getInt("productId", -1)
+
+            if (fragmentToLoad == "DetailsProductFragment" && productId != -1) {
+                val detailsProductFragment = DetailsProductFragment.newInstance(productId!!)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView, detailsProductFragment)
+                    .commit()
+            }
+        }
     }
 }
